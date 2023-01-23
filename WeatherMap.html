@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://kit.fontawesome.com/66bf6e2046.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/WeatherMap.css"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
@@ -10,54 +11,28 @@
     <title>First Mapbox Map</title>
     <!-- Mapbox CSS -->
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.css' rel='stylesheet'/>
-    <!-- Custom CSS -->
-    <style>
-        #map {
-            /* the width and height may be set to any size */
-            width: 100%;
-            height: 600px;
-        }
-    </style>
 </head>
 <body>
 
-<h1>My First Mapbox Map!</h1>
+<nav class= 'navbar navbar-dark mb-5'>
+    <div class="container-fluid">
+        <a class="navbar-brand"><i class="fa-solid fa-sun-cloud"></i>Codeup Clouds (and other weather conditions)</a>
+        <form class="d-flex">
+            <input  class="search-box form-control me-2" id="search-box" type="search" placeholder="Enter Location" aria-label="Search">
+            <button class="search-button btn btn-outline-light" type="button" onclick="addToArray()">Search</button>
+        </form>
+    </div>
+</nav>
 
 <!-- The HTML element that serves as the Mapbox container -->
 <div id='map'></div>
-<button type="button" class="btn btn-primary m-2" onclick="setZoom(5)">5x</button>
-<button type="button" class="btn btn-primary m-2" onclick="setZoom(10)">10x</button>
-<button type="button" class="btn btn-primary m-2" onclick="setZoom(15)">15x</button>
-<br>
-<div id="weather-form">
-<input class="ms-4 mb-4" type="text" id="search-box" placeholder="Enter location">
-<button type="button" class="btn btn-primary ms-2" onclick="addToArray()">add pin</button>
+<div class="zoom-buttons"></div>
+<button type="button" class="zoom" onclick="setZoom(5)">5x</button>
+<button type="button" class="zoom" onclick="setZoom(10)">10x</button>
+<button type="button" class="zoom" onclick="setZoom(15)">15x</button>
 </div>
+<br>
 <div id="weather-info"></div>
-<!--<main class="container-fluid">-->
-<!--    <h2>Weather</h2>-->
-<!--    &lt;!&ndash; results for weather data &ndash;&gt;-->
-<!--    <div class="row gx-2">-->
-<!--        <div class="col">-->
-<!--            <div class="card" style="width: 30vw">-->
-<!--                <h5 class="card-title p-2">Date</h5>-->
-<!--                <img-->
-<!--                        src="http://openweathermap.org/img/wn/10d@4x.png"-->
-<!--                        class="card-img-top"-->
-<!--                        alt="Weather description"-->
-<!--                />-->
-<!--                <div class="card-body">-->
-<!--                    <h3 class="card-title">Weather Label</h3>-->
-<!--                    <p class="card-text">High Temp Low Temp</p>-->
-<!--                    <p class="card-text">HighFeels like</p>-->
-<!--                    <p class="card-text">Humidty</p>-->
-<!--                    <p class="card-text">Precipitation</p>-->
-<!--                    <p class="card-text">Wind speed and direction</p>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</main>-->
 
 <!-- Mapbox JS -->
 <script src='https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.js'></script>
@@ -111,7 +86,7 @@
 
 function getWeatherData(result) {
 
-    $.get("http://api.openweathermap.org/data/2.5/weather", {
+    $.get(`https://api.openweathermap.org/data/2.5/forecast`, {
         APPID: OPENWEATHER_API_KEY,
         lat: result[1],
         lon: result[0],
@@ -119,9 +94,21 @@ function getWeatherData(result) {
     }).done(function (data) {
         console.log('The entire response:', data);
         console.log('Diving in - here is current information: ', data.current);
-        console.log('A step further - information for tomorrow: ', data.daily[1]);
+        console.log('A step further - information for tomorrow: ', data.list[1]);
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
