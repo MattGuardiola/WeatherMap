@@ -13,10 +13,15 @@
 
 #map {
     width: 97%;
-    height: 500px;
+    height: 400px;
     margin: auto;
     border: solid #3d9af1;
 
+}
+
+.tempAndPic{
+    display: flex;
+    justify-content: space-around;
 }
 
 .zoom-buttons{
@@ -34,9 +39,10 @@
     width: 75px;
     border-radius: 18px;
     cursor: pointer;
-    transition: box-shadow .1.5s;
+    transition: box-shadow 1.5s;
     margin-top: .5em;
     margin-left: 20px;
+    margin-bottom: .5em;
 }
 
 .zoom:hover {
@@ -45,5 +51,27 @@
 
 .zoom:active {
     opacity: .7;
+}
+
+
+.weather-cards{
+    display: inline-block;
+    width: 300px;
+    margin: 10px;
+    border: solid;
+    border-radius: 20px;
+}
+
+.cardContainer{
+    display: flex;
+    border: none;
+}
+
+.weather-stats{
+    width: 90%;
+    margin: auto;
+    padding: 0px;
+    margin-bottom: 10px;
+    border-radius: 10px;
 }
 

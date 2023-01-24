@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://kit.fontawesome.com/66bf6e2046.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="css/WeatherMap.css"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
@@ -18,8 +17,8 @@
     <div class="container-fluid">
         <a class="navbar-brand"><i class="fa-solid fa-sun-cloud"></i>Codeup Clouds (and other weather conditions)</a>
         <form class="d-flex">
-            <input  class="search-box form-control me-2" id="search-box" type="search" placeholder="Enter Location" aria-label="Search">
-            <button class="search-button btn btn-outline-light" type="button" onclick="addToArray()">Search</button>
+            <input  class="search-box form-control me-2" id="search-input" type="search" placeholder="Enter Location" aria-label="Search">
+            <button id="searchButton" class="search-button btn btn-outline-light" type="button" onclick="searchLocation(event)">Search</button>
         </form>
     </div>
 </nav>
@@ -32,7 +31,11 @@
 <button type="button" class="zoom" onclick="setZoom(15)">15x</button>
 </div>
 <br>
-<div id="weather-info"></div>
+<div class="cardContainer container-fluid weekly-forecast border">
+
+
+</div>
+<!--</main>-->
 
 <!-- Mapbox JS -->
 <script src='https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.js'></script>
@@ -55,10 +58,15 @@
         center: [-98.4916, 29.4252]
     });
 
+    let markers = []
 
-    function addToArray() {
-        let newLocation = document.getElementById("search-box").value
-        pinThatAdress(newLocation)
+
+    function searchLocation(event) {
+        event.preventDefault();
+        console.log($("#search-input")[0])
+        let newLocation = $("#search-input")[0].value;
+        pinThatAddress(newLocation)
+        $("#search-input")[0].value = "";
     }
 
 
@@ -67,112 +75,81 @@
     }
 
 
-    function pinThatAdress(adress) {
-
-        geocode(adress, MAPBOX_API_KEY).then(function (result) {
+    function pinThatAddress(address) {
+        geocode(address, MAPBOX_API_KEY)
+            .then(function (result) {
             map.setCenter(result)
             map.setZoom(12);
-            marker = new mapboxgl.Marker();
+            const marker = new mapboxgl.Marker({"color": "blue"});
             marker.setLngLat(result);
             marker.addTo(map);
-            let popup = new mapboxgl.Popup();
-            popup.setHTML(`<h3>` + adress + `</h3>`);
-            marker.setPopup(popup);
-            getWeatherData(result);
+            markers.push(marker);
+            // let popup = new mapboxgl.Popup();
+            // popup.setHTML(`<h3>` + adress + `</h3>`);
+            // marker.setPopup(popup);
+            getWeatherData(marker, address, result);
 
-        });
+        }).catch((function (error){
+            console.log("Not a valid location");
+        }));
     }
 
 
-function getWeatherData(result) {
+function getWeatherData(marker, address, result) {
 
+    // $.get("http://api.openweathermap.org/data/2.5/weather", {
     $.get(`https://api.openweathermap.org/data/2.5/forecast`, {
         APPID: OPENWEATHER_API_KEY,
         lat: result[1],
         lon: result[0],
         units: "imperial"
     }).done(function (data) {
-        console.log('The entire response:', data);
-        console.log('Diving in - here is current information: ', data.current);
-        console.log('A step further - information for tomorrow: ', data.list[1]);
+        createPopUp(marker, address, data);
+        weeklyForecast(marker, address, data);
     });
 }
 
 
+    function createPopUp(marker, address, data) {
+        console.log(data);
+        const popUp = new mapboxgl.Popup();
+        popUp.setHTML(
+            '<h3 class="text-capitalize mt-0 text-center">' + address + '</h3>' +
+            '<div class="card"></div>' +
+            '<div class="card-body m-0 p-0">' +
+            '<div class="tempAndPic">' +
+            '<h5>'+ Math.round(data.list[0].main.temp) + '°F</h5>' +
+            '<img src="http://openweathermap.org/img/wn/' + data.list[0].weather[0].icon + '@2x.png" class="card-img-top">' +
+            '</div>' +
+            '<h6 class="card-subtitle mb-2 text-muted">' + data.list[0].weather[0].description + '</h6>' +
+            '<p class="card-text m-0">H: ' + Math.round(data.list[0].main.temp_max) + '°F</p>' +
+            '<p class="card-text m-0">L:  ' + Math.round(data.list[0].main.temp_min) + '°F</p>' +
+            '</div></div>'
+        );
+        marker.setPopup(popUp);
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // function setWeather() {
-    //     $.ajax("data/inventory.json")
-    //         .done(function (data) {
-    //             console.log(data)
-    //             let html = ''
-    //             data.forEach(function (equipment) {
-    //                 html += `
-    //                     <tr>
-    //                         <td>${equipment.title}</td>
-    //                         <td>${equipment.quantity}</td>
-    //                         <td>${equipment.price}</td>
-    //                         <td>${equipment.categories.join(" / ")}</td>
-    //                     </tr>`
-    //             })
-    //             $('#insertProducts').html(html)
-    //             console.log(data)
-    //         })
-    // }
-    //
-    //
-    //
-    //
-    //
-    // // Get the form element
-    // const weatherForm = $('#weather-form');
-    //
-    // // Bind a submit event listener to the form
-    // weatherForm.on('button', function (e) {
-    //     e.preventDefault();
-    //
-    //     // Get the value of the city name or ZIP code input field
-    //     const cityName = $('#search-box').val();
-    //
-    //     // Make a GET request to the OpenWeatherMap API
-    //     $.get(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${OPENWEATHER_API_KEY}`, function (data) {
-    //
-    //         // Extract the relevant information from the API response
-    //         const temperature = data.main.temp;
-    //         const humidity = data.main.humidity;
-    //         const weather = data.weather[0].main;
-    //
-    //         // Update the weather info div with the extracted information
-    //         $('#weather-info').html(`Temperature: ${temperature} &#8451; <br> Humidity: ${humidity}% <br> Weather: ${weather}`);
-    //     }).fail(function (error) {
-    //         console.log(error);
-    //         $('#weather-info').html(`Sorry, there was an error with your request. Please try again later.`);
-    //     });
-    // });
-
+    function weeklyForecast(marker, address, data) {
+        let index = 0;
+        let dayIndex = 1;
+        $(".weekly-forecast").html("");
+        for (let i = 0; i < 5; i++) {
+            $(".weekly-forecast").append(
+                '<div class="weather-cards">' +
+                '<img src="http://openweathermap.org/img/wn/' + data.list[index].weather[0].icon + '@2x.png" class="card-img-top">' +
+                '<div class="card-body">' +
+                '<h5 class="card-title"> Day ' + dayIndex + '</h5>' +
+                '<p class="card-text">' + Math.round(data.list[index].main.temp) + '°F</p></div>' +
+                '<ul class="weather-stats">' +
+                '<li class="list-group-item">Humidity: ' + Math.round(data.list[index].main.humidity) + '</li>' +
+                '<li class="list-group-item">Wind: ' + (data.list[index].wind.speed).toFixed(1) + '</li>' +
+                '<li class="list-group-item">Pressure: ' + Math.round(data.list[index].main.pressure) + '</li>' +
+                '</ul></div>'
+            );
+            dayIndex++;
+            index += 8;
+        }
+    }
 
 </script>
 </body>
